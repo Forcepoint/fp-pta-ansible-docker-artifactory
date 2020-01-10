@@ -1,0 +1,3 @@
+---
+
+vaulted_docker_artifactory_artifactory_user_password: "{{ docker_artifactory_artifactory_user_password }}"

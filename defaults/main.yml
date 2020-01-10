@@ -1,0 +1,10 @@
+---
+# defaults file for docker-artifactory
+
+# https://bintray.com/jfrog/artifactory-pro/jfrog-artifactory-pro-zip
+# https://github.com/jfrog/artifactory-docker-examples/tree/master/docker-compose/artifactory
+
+docker_artifactory_version_jfrog_artifactory_pro: 6.9.1   # This is the official Artifactory Pro release from JFrog.
+docker_artifactory_version_jfrog_postgresql: 9.5.2        # This is NOT the official Postgres release! It is managed by JFrog. 2016-03-28 https://www.postgresql.org/ftp/source/
+docker_artifactory_version_nginx: 1.15.5                  # This is the official NGINX release. # 2018-10-02, Stable, http://nginx.org/en/download.html http://nginx.org/en/CHANGES
+docker_artifactory_timezone: America/Denver               # Default timezone in the container. Otherwise UTC is used.
