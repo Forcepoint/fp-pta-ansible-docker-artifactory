@@ -42,7 +42,7 @@
 - name: create the artifactory_dockerfile folder
   become: yes
   file:
-    path: "{{ docker_artifactory_data }}/artifactory_dockerfile"
+    path: "{{ docker_artifactory_data }}/artifactory_dockerfile/certs/"
     state: directory
     mode: 0740
     recurse: yes
@@ -154,16 +154,17 @@
     source: pull
   notify: "restart nginx"
 
-- name: check for an internal ca cert
-  stat:
-    path: /etc/docker/CAInternal.crt
-  register: stat_cainternal
-
-- name:
-    set_fact:
-      docker_artifactory_add_cainternal: "ADD CAInternal.crt /home/CAInternal.pem"
-      docker_artifactory_cainternal_keystore: "RUN /java/jdk-11.0.2+9/bin/keytool -import -storepass changeit -noprompt -trustcacerts -alias CAInternal -file /home/CAInternal.pem -keystore /java/jdk-11.0.2+9/lib/security/cacerts"
-  when: stat_cainternal.stat.exists
+- name: copy custom certificates to trust
+  become: yes
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ docker_artifactory_data }}/artifactory_dockerfile/certs/"
+    remote_src: {{ item.remote_src }}
+    mode: 0744
+    owner: root
+    group: root
+  loop: "{{ docker_gitlab_certs_to_trust }}"
+  when: docker_artifactory_certs_to_trust is defined
 
 - name: copy the artifactory dockerfile
   become: yes
