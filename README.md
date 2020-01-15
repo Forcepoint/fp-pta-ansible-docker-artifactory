@@ -46,7 +46,7 @@ Ensure they're vaulted before committing them to source code control.
 * docker_artifactory_version_postgresql: The version of PostgreSQL Pro to pull from Docker.
 * docker_artifactory_version_nginx: The version of NGINX to pull from Docker.
 * docker_artifactory_certs_to_trust: A list of certificates to add into 
-  Artifactory's java truststore and whether they are remote or not.
+  Artifactory's java keystore and whether they are remote or not.
   Useful if you're using a private CA for Artifactory's web certificates. 
   Also useful if Artifactory needs to interact with other web applications whose
   certificates aren't in the java truststore, like RedHat's CND.
