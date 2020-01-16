@@ -163,7 +163,7 @@
     mode: 0744
     owner: root
     group: root
-  loop: "{{ docker_gitlab_certs_to_trust }}"
+  loop: "{{ docker_artifactory_certs_to_trust }}"
   when: docker_artifactory_certs_to_trust is defined
 
 - name: copy the artifactory dockerfile
