@@ -159,7 +159,7 @@
   copy:
     src: "{{ item.path }}"
     dest: "{{ docker_artifactory_data }}/artifactory_dockerfile/certs/"
-    remote_src: {{ item.remote_src }}
+    remote_src: "{{ item.remote_src }}"
     mode: 0744
     owner: root
     group: root
