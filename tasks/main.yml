@@ -175,27 +175,6 @@
     owner: root
     group: root
 
-- name: copy the internal ca cert
-  become: yes
-  copy:
-    src: /etc/docker/CAInternal.crt
-    dest: "{{ docker_artifactory_data }}/artifactory_dockerfile/CAInternal.crt"
-    remote_src: yes
-    mode: 0700
-    owner: root
-    group: root
-  when: stat_cainternal.stat.exists
-
-# This is needed if you are using Artifactory to mirror CND packages.
-- name: copy the root cert for https://cnd.redhat.com
-  become: yes
-  copy:
-    src: files/entitlement_master.crt
-    dest: "{{ docker_artifactory_data }}/artifactory_dockerfile/entitlement_master.crt"
-    mode: 0700
-    owner: root
-    group: root
-
 - name: build the artifactory image
   become: yes
   docker_image:
