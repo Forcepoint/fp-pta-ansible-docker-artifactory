@@ -8,5 +8,6 @@ RUN JAVA_HOME=$(java -XshowSettings:properties -version 2>&1  >/dev/null | sed -
 
     && $JAVA_HOME/bin/keytool -import -storepass changeit -noprompt -trustcacerts -alias {{ (item.path | basename | splitext)[0] }} -file /home/certs/{{ item.path | basename }} -keystore $JAVA_HOME/lib/security/cacerts {% if not loop.last %}\{% endif %}
 {% endfor %}
+
 USER artifactory
 {% endif %}
