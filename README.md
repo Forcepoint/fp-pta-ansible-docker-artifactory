@@ -77,7 +77,7 @@ Again, make sure you get that password vaulted so it's not in plain text!
 
 ## License
 
-BSD
+BSD-3-Clause
 
 ## Author Information
 
