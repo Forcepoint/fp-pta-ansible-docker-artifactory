@@ -17,9 +17,6 @@ Be aware that you may need to add an intermediate cert for it. I had to do this 
    the pem files together - just open them in a text editor and just append the contents of the 
    intermediate cert's pem file onto the certicate's pem file. Once combined, you're good to go.
 
-If the system has an Internal CA certificate on the system (placed there by the docker-host role),
-it will be automatically applied and used in the Artifactory image.
-
 ## Requirements
 
 Run the role docker-host on the host. The following files are required to be present. 
