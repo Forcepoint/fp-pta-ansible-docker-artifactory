@@ -17,6 +17,26 @@ Be aware that you may need to add an intermediate cert for it. I had to do this 
    the pem files together - just open them in a text editor and just append the contents of the 
    intermediate cert's pem file onto the certicate's pem file. Once combined, you're good to go.
 
+One additional thing to note about Artifactory's certificate is how you intend to use docker.
+You should consult Artifactory's documentation about hosting docker repositories. 
+https://www.jfrog.com/confluence/display/JFROG/HTTP+Settings#HTTPSettings-UsingaReverseProxy
+The recommended method is to use subdomains, which I recommend from an ease of use perspective. 
+This unfortunately requires a
+change in how you craft your CSR to wildcard the subdomain and also how much such a wildcard
+certificate costs from a CA. Of note, if you're using the process outlined here 
+https://github.com/Forcepoint/fp-pta-host-ptacontroller-master/blob/master/files/README.md you need
+to make two modifications.
+
+1. Alter san.cnf to change the CN to have a *. infront of the dns name.
+
+        CN=*.artifactory.company.com
+
+1. Alter san.cnf to have a second DNS entry under alt_names.
+
+        [alt_names]
+        DNS.1   = *.artifactory.company.com
+        DNS.2   = artifactory.company.com
+
 ## Requirements
 
 Run the role docker-host on the host. The following files are required to be present. 
