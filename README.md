@@ -1,5 +1,7 @@
 # docker-artifactory
 
+For information about PTA and how to use it with this Ansible role please visit https://github.com/Forcepoint/fp-pta-overview/blob/master/README.md
+
 Refer to the [JFrog Artifactory Upgrade Guide for Docker](https://www.jfrog.com/confluence/display/RTF/Upgrading+Artifactory#UpgradingArtifactory-DockerInstallation),
 the [JFrog Docker Installation Guide](https://www.jfrog.com/confluence/display/RTF/Installing+with+Docker)
 and the [JFrog Artifactory Release Notes](https://www.jfrog.com/confluence/display/RTF/Release+Notes).
