@@ -144,7 +144,7 @@
 - name: pull the postgres docker image
   become: yes
   docker_image:
-    name: postgres:{{ docker_artifactory_version_postgresql }}-alpine
+    name: postgres:{{ docker_artifactory_version_postgresql }}
     source: pull
   notify: "restart artifactory"
 

@@ -1,7 +1,7 @@
 version: '2'
 services:
   postgresql:
-    image: postgres:{{ docker_artifactory_version_jfrog_postgresql }}-alpine
+    image: postgres:{{ docker_artifactory_version_jfrog_postgresql }}
     container_name: postgresql
     ports:
      - 5432:5432
