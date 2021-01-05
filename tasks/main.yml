@@ -211,7 +211,7 @@
 
 - name: run the postgres export and import
   include_tasks: postgresql_data_export_import.yml
-  when: docker_artifactory_postgresql_data_export_import == "yes"
+  when: docker_artifactory_postgresql_data_export_import | bool
 
 - name: bring up the docker instances for artifactory, nginx, and postgresql
   become: yes
