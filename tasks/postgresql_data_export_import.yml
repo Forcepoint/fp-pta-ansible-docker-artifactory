@@ -102,6 +102,10 @@
     cmd: docker exec postgresql sh -c 'psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }} < /tmp/dump.sql'
     executable: /bin/bash
 
+- name: wait 15 seconds to ensure the changes have all been imported
+  pause:
+    seconds: 15
+
 - name: delete the data dump file from the docker compose
   become: yes
   ansible.builtin.file:
