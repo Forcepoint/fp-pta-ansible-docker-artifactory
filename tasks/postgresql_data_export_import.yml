@@ -45,30 +45,36 @@
     state: present
     stopped: yes
 
+- name: delete any backup of the mapped volume for postgresql
+  become: yes
+  ansible.builtin.file:
+    path: "{{ docker_artifactory_data }}/postgresql.bak"
+    state: absent
+
+- name: backup the mapped volume for postgresql
+  become: yes
+  ansible.builtin.copy:
+    src: "{{ docker_artifactory_data }}/postgresql"
+    remote_src: yes
+    dest: "{{ docker_artifactory_data }}/postgresql.bak"
+
 - name: delete the mapped volume for postgresql
   become: yes
   ansible.builtin.file:
     path: "{{ docker_artifactory_data }}/postgresql"
     state: absent
 
-- name: recreate the mapped volume for postgresql
+- name: recreate the folder for the postgresql mapped volume
   become: yes
   file:
     path: "{{ docker_artifactory_data }}/postgresql"
     state: directory
     mode: 0700
 
-- name: copy in the dump
-  become: yes
-  ansible.builtin.copy:
-    src: "{{ docker_artifactory_docker_compose_folder }}/dump.sql"
-    remote_src: yes
-    dest: "{{ docker_artifactory_data }}/postgresql/dump.sql"
-
-- name: ensure the dump file is readable
+- name: ensure the data dump file is readable
   become: yes
   ansible.builtin.file:
-    path: "{{ docker_artifactory_data }}/postgresql/dump.sql"
+    path: "{{ docker_artifactory_docker_compose_folder }}/dump.sql"
     mode: 0444
 
 - name: start just the postgresql container
@@ -80,21 +86,27 @@
     services:
       - postgresql
 
+- name: copy the data dump into the container
+  become: yes
+  ansible.builtin.shell:
+    cmd: docker cp {{ docker_artifactory_docker_compose_folder }}/dump.sql postgresql:/tmp
+    executable: /bin/bash
+
 - name: import the postgres data
   become: yes
   ansible.builtin.shell:
-    cmd: docker exec postgresql psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }}  < /var/lib/postgresql/data/dump.sql
+    cmd: docker exec postgresql psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }}  < /tmp/dump.sql
     executable: /bin/bash
 
-- name: cleanup the dump file from the docker compose
+- name: delete the data dump file from the docker compose
   become: yes
   ansible.builtin.file:
     path: "{{ docker_artifactory_docker_compose_folder }}/dump.sql"
     state: absent
 
-- name: cleanup the dump file from the postgresql mapped volume
+- name: delete the backup of the postgresql mapped volume
   become: yes
   ansible.builtin.file:
-    path: "{{ docker_artifactory_data }}/postgresql/dump.sql"
+    path: "{{ docker_artifactory_data }}/postgresql.bak"
     state: absent
 
