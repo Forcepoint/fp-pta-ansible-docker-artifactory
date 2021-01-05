@@ -4,7 +4,3 @@
 - name: restart nginx
   become: yes
   command: docker restart nginx
-
-- name: restart artifactory
-  become: yes
-  command: docker restart artifactory

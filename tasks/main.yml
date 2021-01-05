@@ -146,14 +146,14 @@
   docker_image:
     name: postgres:{{ docker_artifactory_postgresql_tag }}
     source: pull
-  notify: "restart artifactory"
+  register: docker_artifactory_postgresql_pull_result
 
 - name: pull the artifactory-pro docker image
   become: yes
   docker_image:
     name: docker.bintray.io/jfrog/artifactory-pro:{{ docker_artifactory_artifactory_pro_tag }}
     source: pull
-  notify: "restart nginx"
+  register: docker_artifactory_artifactory_pull_result
 
 - name: copy custom certificates to trust
   become: yes
@@ -191,6 +191,7 @@
   docker_image:
     name: nginx:{{ docker_artifactory_nginx_tag }}
     source: pull
+  register: docker_artifactory_nginx_pull_result
 
 - name: create the docker_compose folder
   become: yes
@@ -209,22 +210,56 @@
     owner: root
     group: root
 
-- name: run the postgres export and import
-  include_tasks: postgresql_data_export_import.yml
-  when: docker_artifactory_postgresql_data_export_import | bool
+# Normally, when using docker-compose, I would let the compose spin up the containers all at once. It's easier that way.
+# Unfortunately, starting from Artifactory 7.8.x, PostgreSQL needs to be started before starting the other services.
+# So let's start it first by default from now on, not caring what version of Artifactory we're using.
 
-- name: bring up the docker instances for artifactory, nginx, and postgresql
+- name: stop the artifactory and nginx containers
+  become: yes
+  community.general.docker_compose:
+    project_name: artifactory
+    project_src: "{{ docker_artifactory_docker_compose_folder }}"
+    stopped: yes
+    services:
+      - artifactory
+      - nginx
+  when: docker_artifactory_nginx_pull_result.changed or docker_artifactory_artifactory_pull_result.changed or docker_artifactory_postgresql_pull_result.changed
+
+- name: run the postgres export and import
+  include_tasks: postgresql_migrate.yml
+  when: docker_artifactory_postgresql_pull_result.changed or docker_artifactory_postgresql_migrate_bool
+
+- name: bring up the docker instance for postgresql
   become: yes
   docker_compose:
     project_name: artifactory
     project_src: "{{ docker_artifactory_docker_compose_folder }}"
-  register: docker_compose_output
+    services:
+      - postgresql
+  register: docker_artifactory_compose_postgresql_result
 
 - assert:
     that:
-      - "docker_compose_output.ansible_facts.postgresql.postgresql.state.running"
-      - "docker_compose_output.ansible_facts.artifactory.artifactory.state.running"
-      - "docker_compose_output.ansible_facts.nginx.nginx.state.running"
+      - "docker_artifactory_compose_postgresql_result.ansible_facts.postgresql.postgresql.state.running"
+
+- name: wait 15 seconds to ensure the postgresql container is up
+  pause:
+    seconds: 15
+
+- name: bring up the docker instances for artifactory and nginx
+  become: yes
+  docker_compose:
+    project_name: artifactory
+    project_src: "{{ docker_artifactory_docker_compose_folder }}"
+    services:
+      - artifactory
+      - nginx
+  register: docker_artifactory_compose_artifactory_nginx_result
+
+- assert:
+    that:
+      - "docker_artifactory_compose_artifactory_nginx_result.ansible_facts.artifactory.artifactory.state.running"
+      - "docker_artifactory_compose_artifactory_nginx_result.ansible_facts.nginx.nginx.state.running"
 
 - name: delete the docker-compose as it has secrets
   become: yes
