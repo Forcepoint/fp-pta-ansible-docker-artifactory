@@ -144,14 +144,14 @@
 - name: pull the postgres docker image
   become: yes
   docker_image:
-    name: postgres:{{ docker_artifactory_version_postgresql }}
+    name: postgres:{{ docker_artifactory_postgresql_tag }}
     source: pull
   notify: "restart artifactory"
 
 - name: pull the artifactory-pro docker image
   become: yes
   docker_image:
-    name: docker.bintray.io/jfrog/artifactory-pro:{{ docker_artifactory_version_jfrog_artifactory_pro }}
+    name: docker.bintray.io/jfrog/artifactory-pro:{{ docker_artifactory_artifactory_pro_tag }}
     source: pull
   notify: "restart nginx"
 
@@ -183,13 +183,13 @@
       path: "{{ docker_artifactory_data }}/artifactory_dockerfile"
       pull: no
     name: artifactory/artifactory-pro-custom
-    tag: "{{ docker_artifactory_version_jfrog_artifactory_pro }}"
+    tag: "{{ docker_artifactory_artifactory_pro_tag }}"
     source: build
 
 - name: pull the nginx docker image
   become: yes
   docker_image:
-    name: nginx:{{ docker_artifactory_version_nginx }}
+    name: nginx:{{ docker_artifactory_nginx_tag }}
     source: pull
 
 - name: create the docker_compose folder

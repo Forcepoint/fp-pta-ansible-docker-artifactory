@@ -1,7 +1,7 @@
 version: '2'
 services:
   postgresql:
-    image: postgres:{{ docker_artifactory_version_jfrog_postgresql }}
+    image: postgres:{{ docker_artifactory_postgresql_tag }}
     container_name: postgresql
     ports:
      - 5432:5432
@@ -19,7 +19,7 @@ services:
         soft: 32000
         hard: 40000
   artifactory:
-    image: artifactory/artifactory-pro-custom:{{ docker_artifactory_version_jfrog_artifactory_pro }}
+    image: artifactory/artifactory-pro-custom:{{ docker_artifactory_artifactory_pro_tag }}
     container_name: artifactory
     ports:
      - 8081:8081
@@ -43,7 +43,7 @@ services:
         soft: 32000
         hard: 40000
   nginx:
-    image: nginx:{{ docker_artifactory_version_nginx }}
+    image: nginx:{{ docker_artifactory_nginx_tag }}
     container_name: nginx
     ports:
      - 80:80

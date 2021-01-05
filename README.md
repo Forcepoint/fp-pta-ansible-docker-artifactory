@@ -62,12 +62,12 @@ Ensure they're vaulted before committing them to source code control.
 ### OPTIONAL
 
 * docker_artifactory_version_artifactory_pro: The version of Artifactory Pro container to pull.
-* docker_artifactory_version_postgresql: The version of PostgreSQL container to pull.
+* docker_artifactory_postgresql_tag: The version of PostgreSQL container to pull.
 * docker_artifactory_postgresql_data_export_import: When this is yes, the postgresql data is 
   extracted, a new container spun up in its place, and the data imported. This of course assumes you
   already have Artifactory running. If you don't, this won't work.
   **This is required when the postgresql version is changed. Be sure to set it back to no after it's run successfully.**
-* docker_artifactory_version_nginx: The version of NGINX container to pull.
+* docker_artifactory_nginx_tag: The version of NGINX container to pull.
 * docker_artifactory_certs_to_trust: A list of certificates to add into 
   Artifactory's java keystore and whether they are remote or not.
   Useful if you're using a private CA for Artifactory's web certificates. 

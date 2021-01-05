@@ -1,4 +1,4 @@
-FROM docker.bintray.io/jfrog/artifactory-pro:{{ docker_artifactory_version_jfrog_artifactory_pro }}
+FROM docker.bintray.io/jfrog/artifactory-pro:{{ docker_artifactory_artifactory_pro_tag }}
 {% if docker_artifactory_certs_to_trust is defined %}
 # Add in any certificates if present.
 COPY certs/* /home/certs/
