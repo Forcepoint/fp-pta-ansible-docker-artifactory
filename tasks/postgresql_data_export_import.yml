@@ -92,13 +92,9 @@
     cmd: docker cp {{ docker_artifactory_docker_compose_folder }}/dump.sql postgresql:/tmp
     executable: /bin/bash
 
-- name: ensure the database is ready to accept connections
-  become: yes
-  shell: docker logs postgresql
-  register: docker_artifactory_postgresql_log_result
-  until: docker_artifactory_postgresql_log_result.stdout.find("database system is ready to accept connections") != -1
-  retries: 120
-  delay: 5
+- name: wait 15 seconds to ensure the database has had time to startup
+  pause:
+    seconds: 15
 
 - name: import the postgres data
   become: yes
