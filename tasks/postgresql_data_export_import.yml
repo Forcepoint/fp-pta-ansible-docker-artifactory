@@ -1,0 +1,102 @@
+---
+
+# https://medium.com/better-programming/how-to-upgrade-your-postgresql-version-using-docker-d1e81dbbbdf9
+
+- name: get info on postgresql container
+  become: yes
+  community.general.docker_container_info:
+    name: postgresql
+  register: docker_artifactory_postgresql_container_result
+
+- name: ensure the postgresql container exists
+  ansible.builtin.assert:
+    that:
+      - "docker_artifactory_postgresql_container_result.exists"
+
+- name: stop the artifactory and nginx containers
+  become: yes
+  community.general.docker_compose:
+    project_name: artifactory
+    project_src: "{{ docker_artifactory_docker_compose_folder }}"
+    state: present
+    stopped: yes
+    services:
+      - artifactory
+      - nginx
+
+- name: ensure the dump file is not present
+  become: yes
+  ansible.builtin.file:
+    path: "{{ docker_artifactory_docker_compose_folder }}/dump.sql"
+    state: absent
+
+- name: export the postgres data
+  become: yes
+  ansible.builtin.shell:
+    cmd: docker-compose exec postgresql pg_dumpall -U {{ docker_artifactory_postgres_user }} > dump.sql
+    args:
+      chdir: "{{ docker_artifactory_docker_compose_folder }}"
+      executable: /bin/bash
+
+- name: stop all the docker-compose containers
+  become: yes
+  community.general.docker_compose:
+    project_name: artifactory
+    project_src: "{{ docker_artifactory_docker_compose_folder }}"
+    state: present
+    stopped: yes
+
+- name: delete the mapped volume for postgresql
+    become: yes
+  ansible.builtin.file:
+    path: "{{ docker_artifactory_data }}/postgresql"
+    state: absent
+
+- name: recreate the mapped volume for postgresql
+  become: yes
+  file:
+    path: "{{ docker_artifactory_data }}/postgresql"
+    state: directory
+    mode: 0700
+
+- name: copy in the dump
+  become: yes
+  ansible.builtin.copy:
+    src: "{{ docker_artifactory_docker_compose_folder }}/dump.sql"
+    remote_src: yes
+    dest: "{{ docker_artifactory_data }}/postgresql/dump.sql"
+
+- name: ensure the dump file is readable
+  become: yes
+  ansible.builtin.file:
+    path: "{{ docker_artifactory_data }}/postgresql/dump.sql"
+    mode: 0444
+
+- name: start just the postgresql container
+  become: yes
+  community.general.docker_compose:
+    project_name: artifactory
+    project_src: "{{ docker_artifactory_docker_compose_folder }}"
+    state: present
+    services:
+      - postgresql
+
+- name: import the postgres data
+  become: yes
+  ansible.builtin.shell:
+    cmd: docker-compose exec postgresql psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }}  < /var/lib/postgresql/data/dump.sql
+    args:
+      executable: /bin/bash
+
+- name: cleanup the dump file from the docker compose
+  become: yes
+  ansible.builtin.file:
+    path: "{{ docker_artifactory_docker_compose_folder }}/dump.sql"
+    state: absent
+
+- name: cleanup the dump file from the postgresql mapped volume
+  become: yes
+  ansible.builtin.file:
+    path: "{{ docker_artifactory_data }}/postgresql/dump.sql"
+    state: absent
+

@@ -144,8 +144,9 @@
 - name: pull the postgres docker image
   become: yes
   docker_image:
-    name: docker.bintray.io/postgres:{{ docker_artifactory_version_jfrog_postgresql }}
+    name: postgres:{{ docker_artifactory_version_jfrog_postgresql }}-alpine
     source: pull
+  notify: "restart artifactory"
 
 - name: pull the artifactory-pro docker image
   become: yes
@@ -191,73 +192,32 @@
     name: nginx:{{ docker_artifactory_version_nginx }}
     source: pull
 
+- name: create the docker_compose folder
+  become: yes
+  file:
+    path: "{{ docker_artifactory_docker_compose_folder }}"
+    state: directory
+    mode: 0740
+    recurse: yes
+
+- name: copy the docker-compose.yml file
+  become: yes
+  template:
+    src: "templates/docker-compose.yml"
+    dest: "{{ docker_artifactory_docker_compose_folder }}/docker-compose.yml"
+    mode: 0700
+    owner: root
+    group: root
+
+- name: run the postgres export and import
+  include_tasks: postgresql_data_export_import.yml
+  when: docker_artifactory_postgresql_data_export_import == "yes"
+
 - name: bring up the docker instances for artifactory, nginx, and postgresql
   become: yes
   docker_compose:
     project_name: artifactory
-    definition:
-      version: '2'
-      services:
-        postgresql:
-          image: docker.bintray.io/postgres:{{ docker_artifactory_version_jfrog_postgresql }}
-          container_name: postgresql
-          ports:
-           - 5432:5432
-          environment:
-           - POSTGRES_DB=artifactory
-           - POSTGRES_USER={{ docker_artifactory_postgres_user }}
-           - POSTGRES_PASSWORD={{ docker_artifactory_postgres_password }}
-          volumes:
-           - "{{ docker_artifactory_data }}/postgresql:/var/lib/postgresql/data"
-          restart: always
-          ulimits:
-            nproc: 65535
-            nofile:
-              soft: 32000
-              hard: 40000
-        artifactory:
-          image: artifactory/artifactory-pro-custom:{{ docker_artifactory_version_jfrog_artifactory_pro }}
-          container_name: artifactory
-          ports:
-           - 8081:8081
-          depends_on:
-           - postgresql
-          links:
-           - postgresql
-          volumes:
-           - "{{ docker_artifactory_data }}/artifactory:/var/opt/jfrog/artifactory"
-           - "{{ docker_artifactory_data }}/artifactory_extra_conf:/artifactory_extra_conf"
-          environment:
-           - DB_TYPE=postgresql
-           - DB_USER={{ docker_artifactory_postgres_user }}
-           - DB_PASSWORD={{ docker_artifactory_postgres_password }}
-           - TZ={{ docker_artifactory_timezone }}
-          restart: always
-          ulimits:
-            nproc: 65535
-            nofile:
-              soft: 32000
-              hard: 40000
-        nginx:
-          image: nginx:{{ docker_artifactory_version_nginx }}
-          container_name: nginx
-          ports:
-           - 80:80
-           - 443:443
-          depends_on:
-           - artifactory
-          links:
-           - artifactory
-          volumes:
-           - "{{ docker_artifactory_data }}/nginx/conf.d/artifactory.conf:/etc/nginx/conf.d/artifactory.conf"
-           - "{{ docker_artifactory_data }}/nginx/logs:/var/log/nginx"
-           - "{{ docker_artifactory_data }}/nginx/ssl:/etc/ssl"
-          restart: always
-          ulimits:
-            nproc: 65535
-            nofile:
-              soft: 32000
-              hard: 40000
+    project_src: "{{ docker_artifactory_docker_compose_folder }}"
   register: docker_compose_output
 
 - assert:
