@@ -33,7 +33,7 @@
 - name: export the postgres data
   become: yes
   ansible.builtin.shell:
-    cmd: docker-compose exec postgresql pg_dumpall -U {{ docker_artifactory_postgres_user }} > dump.sql
+    cmd: docker exec postgresql pg_dumpall -U {{ docker_artifactory_postgres_user }} > dump.sql
     chdir: "{{ docker_artifactory_docker_compose_folder }}"
     executable: /bin/bash
 
@@ -83,7 +83,7 @@
 - name: import the postgres data
   become: yes
   ansible.builtin.shell:
-    cmd: docker-compose exec postgresql psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }}  < /var/lib/postgresql/data/dump.sql
+    cmd: docker exec postgresql psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }}  < /var/lib/postgresql/data/dump.sql
     executable: /bin/bash
 
 - name: cleanup the dump file from the docker compose
