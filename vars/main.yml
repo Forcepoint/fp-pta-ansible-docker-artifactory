@@ -4,4 +4,4 @@ vaulted_docker_artifactory_artifactory_user_password: "{{ docker_artifactory_art
 docker_artifactory_docker_compose_folder: "{{ docker_artifactory_data }}/docker_compose/"
 docker_artifactory_postgres_default_db: artifactory
 # Whether the user entered "yes" as a string or yes as a bool, this will ensure it gets evaluated correctly.
-docker_artifactory_postgresql_migrate_bool: "{{ docker_artifactory_postgresql_migrate }}" | bool
+docker_artifactory_postgresql_migrate_bool: docker_artifactory_postgresql_migrate | bool
