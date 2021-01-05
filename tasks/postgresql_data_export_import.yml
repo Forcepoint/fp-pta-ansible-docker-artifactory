@@ -47,7 +47,7 @@
     stopped: yes
 
 - name: delete the mapped volume for postgresql
-    become: yes
+  become: yes
   ansible.builtin.file:
     path: "{{ docker_artifactory_data }}/postgresql"
     state: absent
