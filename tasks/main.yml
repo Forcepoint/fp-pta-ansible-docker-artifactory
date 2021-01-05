@@ -155,37 +155,6 @@
     source: pull
   register: docker_artifactory_artifactory_pull_result
 
-- name: copy custom certificates to trust
-  become: yes
-  copy:
-    src: "{{ item.path }}"
-    dest: "{{ docker_artifactory_data }}/artifactory_dockerfile/certs/"
-    remote_src: "{{ item.remote_src }}"
-    mode: 0744
-    owner: root
-    group: root
-  loop: "{{ docker_artifactory_certs_to_trust }}"
-  when: docker_artifactory_certs_to_trust is defined
-
-- name: copy the artifactory dockerfile
-  become: yes
-  template:
-    src: "templates/Dockerfile"
-    dest: "{{ docker_artifactory_data }}/artifactory_dockerfile/Dockerfile"
-    mode: 0700
-    owner: root
-    group: root
-
-- name: build the artifactory image
-  become: yes
-  docker_image:
-    build:
-      path: "{{ docker_artifactory_data }}/artifactory_dockerfile"
-      pull: no
-    name: artifactory/artifactory-pro-custom
-    tag: "{{ docker_artifactory_artifactory_pro_tag }}"
-    source: build
-
 - name: pull the nginx docker image
   become: yes
   docker_image:

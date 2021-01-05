@@ -33,9 +33,9 @@ server {
     proxy_max_temp_file_size 0;
     proxy_cookie_path   ~*^/.* /;
     if ( $request_uri ~ ^/artifactory/(.*)$ ) {
-        proxy_pass          http://artifactory:8081/artifactory/$1;
+        proxy_pass          http://artifactory:8082/$1;
     }
-    proxy_pass          http://artifactory:8081/artifactory/;
+    proxy_pass          http://artifactory:8082/;
     proxy_set_header    X-Artifactory-Override-Base-Url $http_x_forwarded_proto://$host:$server_port/artifactory;
     proxy_set_header    X-Forwarded-Port  $server_port;
     proxy_set_header    X-Forwarded-Proto $http_x_forwarded_proto;

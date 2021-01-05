@@ -19,10 +19,11 @@ services:
         soft: 32000
         hard: 40000
   artifactory:
-    image: artifactory/artifactory-pro-custom:{{ docker_artifactory_artifactory_pro_tag }}
+    image: docker.bintray.io/jfrog/artifactory-pro:{{ docker_artifactory_artifactory_pro_tag }}
     container_name: artifactory
     ports:
-     - 8081:8081
+     - 8081:8081     # for artifactory communication
+     - 8082:8082     # for router communication
     depends_on:
      - postgresql
     links:
@@ -32,9 +33,15 @@ services:
      - "{{ docker_artifactory_data }}/artifactory_extra_conf:/artifactory_extra_conf"
      - /etc/localtime:/etc/localtime:ro
     environment:
-     - DB_TYPE=postgresql
-     - DB_USER={{ docker_artifactory_postgres_user }}
-     - DB_PASSWORD={{ docker_artifactory_postgres_password }}
+     - ENABLE_MIGRATION=y
+     - JF_SHARED_DATABASE_TYPE=postgresql
+     - JF_SHARED_DATABASE_USERNAME={{ docker_artifactory_postgres_user }}
+     - JF_SHARED_DATABASE_PASSWORD={{ docker_artifactory_postgres_password }}
+     - JF_SHARED_DATABASE_URL=jdbc:postgresql://postgresql:5432/artifactory
+     - JF_SHARED_DATABASE_DRIVER=org.postgresql.Driver
+     - JF_SHARED_NODE_IP={{ ansible_default_ipv4.address }}
+     - JF_SHARED_NODE_ID=localhost
+     - JF_ROUTER_ENTRYPOINTS_EXTERNALPORT=8082
      - TZ={{ docker_artifactory_timezone }}
     restart: always
     ulimits:

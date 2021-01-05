@@ -1,8 +1,8 @@
 ---
 # defaults file for docker-artifactory
 
-docker_artifactory_artifactory_pro_tag: 6.14.1        # 2019-11-11 This is an official Artifactory Pro release from JFrog. https://bintray.com/jfrog/reg2/jfrog%3Aartifactory-pro
-docker_artifactory_nginx_tag: 1.15.5                  # 2018-10-02 This is an official NGINX release. http://nginx.org/en/download.html http://nginx.org/en/CHANGES https://hub.docker.com/_/nginx
-docker_artifactory_postgresql_tag: 9.5.2              # 2016-03-28 This is an official Postgres release. https://www.postgresql.org/ftp/source/ https://hub.docker.com/_/postgres
+docker_artifactory_artifactory_pro_tag: 7.12.5        # 2020-12-30 This is an official Artifactory Pro release from JFrog. https://bintray.com/jfrog/reg2/jfrog%3Aartifactory-pro https://releases.jfrog.io/artifactory/artifactory-pro/org/artifactory/pro/docker/jfrog-artifactory-pro/
+docker_artifactory_nginx_tag: 1.19.6                  # 2020-12-15 This is an official NGINX release. http://nginx.org/en/download.html http://nginx.org/en/CHANGES https://hub.docker.com/_/nginx
+docker_artifactory_postgresql_tag: 12.3-alpine        # 2020-06-26 This is an official Postgres release. https://www.postgresql.org/ftp/source/ https://hub.docker.com/_/postgres
 docker_artifactory_postgresql_migrate: no             # When this is yes, the database is extracted, a new container spun up in its place, and the data reimported. This is run by default when the postgresql tag is changed.
 docker_artifactory_timezone: America/Denver           # Default timezone in the container. Otherwise UTC is used.

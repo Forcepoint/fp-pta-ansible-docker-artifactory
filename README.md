@@ -7,17 +7,7 @@ the [JFrog Docker Installation Guide](https://www.jfrog.com/confluence/display/R
 and the [JFrog Artifactory Release Notes](https://www.jfrog.com/confluence/display/RTF/Release+Notes).
 
 Setup the host to configure and start Artifactory Pro and associated docker containers. HTTPS is enabled by default. 
-Be aware that you may need to add an intermediate cert for it. I had to do this for Red Hat's CND.
- 
-1. You have to figure out what the intermediate cert is that you need. 
-   You can do this by running an openssl command to get the common name of the cert, 
-   then searching the web for it. You'll end up at the certificate issuer's webpage as they 
-   maintain the list of intermediate certs. If you're being extra careful, verify the checksum's 
-   match of the cert you 'think' is the one on their website versus the one referenced by the cert you have. 
-   I won't go into how to do that. Download the pem file.
-2. This [page](https://www.digicert.com/ssl-support/pem-ssl-creation.htm) told me how to combine 
-   the pem files together - just open them in a text editor and just append the contents of the 
-   intermediate cert's pem file onto the certicate's pem file. Once combined, you're good to go.
+Be aware that you may need to add an intermediate cert for it. You can now do this with Artifactory's UI.
 
 One additional thing to note about Artifactory's certificate is how you intend to use docker.
 You should consult Artifactory's documentation about hosting docker repositories. 
@@ -68,11 +58,6 @@ Ensure they're vaulted before committing them to source code control.
   tag is changed. You shouldn't need to set this unless you must force the replacement of 
   the postgres data. Afterwards, you should set this back to no.
 * docker_artifactory_nginx_tag: The tag of the NGINX container to pull.
-* docker_artifactory_certs_to_trust: A list of certificates to add into 
-  Artifactory's java keystore and whether they are remote or not.
-  Useful if you're using a private CA for Artifactory's web certificates. 
-  Also useful if Artifactory needs to interact with other web applications whose
-  certificates aren't in the java truststore, like RedHat's CND.
 
 Make sure you get any passwords vaulted so they're not in plain text!
 
