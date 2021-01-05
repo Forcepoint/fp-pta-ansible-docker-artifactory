@@ -95,7 +95,7 @@
 - name: import the postgres data
   become: yes
   ansible.builtin.shell:
-    cmd: docker exec postgresql psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }}  < /tmp/dump.sql
+    cmd: docker exec postgresql sh -c 'psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }} < /tmp/dump.sql'
     executable: /bin/bash
 
 - name: delete the data dump file from the docker compose
