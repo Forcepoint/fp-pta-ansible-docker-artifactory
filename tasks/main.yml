@@ -225,3 +225,9 @@
       - "docker_compose_output.ansible_facts.postgresql.postgresql.state.running"
       - "docker_compose_output.ansible_facts.artifactory.artifactory.state.running"
       - "docker_compose_output.ansible_facts.nginx.nginx.state.running"
+
+- name: delete the docker-compose as it has secrets
+  become: yes
+  file:
+    path: "{{ docker_artifactory_docker_compose_folder }}"
+    state: absent
