@@ -34,9 +34,8 @@
   become: yes
   ansible.builtin.shell:
     cmd: docker-compose exec postgresql pg_dumpall -U {{ docker_artifactory_postgres_user }} > dump.sql
-    args:
-      chdir: "{{ docker_artifactory_docker_compose_folder }}"
-      executable: /bin/bash
+    chdir: "{{ docker_artifactory_docker_compose_folder }}"
+    executable: /bin/bash
 
 - name: stop all the docker-compose containers
   become: yes
@@ -85,8 +84,7 @@
   become: yes
   ansible.builtin.shell:
     cmd: docker-compose exec postgresql psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }}  < /var/lib/postgresql/data/dump.sql
-    args:
-      executable: /bin/bash
+    executable: /bin/bash
 
 - name: cleanup the dump file from the docker compose
   become: yes
