@@ -10,8 +10,7 @@ ssl_certificate_key  /etc/ssl/artifactory/{{docker_artifactory_dns }}.key;
 ssl_session_cache shared:SSL:1m;
 ssl_prefer_server_ciphers   on;
 
-## server configurations
-
+## server configuration
 server {
     listen 443 ssl;
 
@@ -24,30 +23,30 @@ server {
     access_log /var/log/nginx/{{docker_artifactory_dns }}-access.log;
     error_log /var/log/nginx/{{docker_artifactory_dns }}-error.log;
 
-    if ( $repo != "" ){
-        rewrite ^/(v1|v2)/(.*) /artifactory/api/docker/$repo/$1/$2;
-    }
+    rewrite ^/$ /ui/ redirect;
+    rewrite ^/ui$ /ui/ redirect;
+    rewrite ^/(v1|v2)/(.*) /artifactory/api/docker/$repo/$1/$2;
     chunked_transfer_encoding on;
     client_max_body_size 0;
+    
     location / {
-        proxy_read_timeout  900;
+        proxy_read_timeout  2400s;
         proxy_pass_header   Server;
 
         # https://www.jfrog.com/jira/browse/RTFACT-16743
         proxy_max_temp_file_size 0;
 
-        proxy_cookie_path   ~*^/.* /;
+        proxy_cookie_path ~*^/.* /;
+        proxy_buffer_size 128k;
+        proxy_buffers 40 128k;
+        proxy_busy_buffers_size 128k;
+
         proxy_pass          http://artifactory:8082;
-        proxy_set_header    X-Artifactory-Override-Base-Url $http_x_forwarded_proto://$host:$server_port;
+        proxy_set_header    X-JFrog-Override-Base-Url $http_x_forwarded_proto://$host:$server_port;
         proxy_set_header    X-Forwarded-Port  $server_port;
         proxy_set_header    X-Forwarded-Proto $http_x_forwarded_proto;
         proxy_set_header    Host              $http_host;
         proxy_set_header    X-Forwarded-For   $proxy_add_x_forwarded_for;
-
-        if ($http_content_type = "application/grpc") {
-            ## if tls is disabled in access, use 'grpc' protocol
-            grpc_pass grpcs://artifactory:8082;
-        }
 
         location ~ ^/artifactory/ {
             proxy_pass    http://artifactory:8081;
