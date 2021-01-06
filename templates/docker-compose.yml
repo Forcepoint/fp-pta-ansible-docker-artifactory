@@ -1,0 +1,72 @@
+version: '2'
+services:
+  postgresql:
+    image: postgres:{{ docker_artifactory_postgresql_tag }}
+    container_name: postgresql
+    ports:
+     - 5432:5432
+    environment:
+     - POSTGRES_DB={{ docker_artifactory_postgres_default_db }}
+     - POSTGRES_USER={{ docker_artifactory_postgres_user }}
+     - POSTGRES_PASSWORD={{ docker_artifactory_postgres_password }}
+    volumes:
+     - "{{ docker_artifactory_data }}/postgresql:/var/lib/postgresql/data"
+     - /etc/localtime:/etc/localtime:ro
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+  artifactory:
+    image: docker.bintray.io/jfrog/artifactory-pro:{{ docker_artifactory_artifactory_pro_tag }}
+    container_name: artifactory
+    ports:
+     - 8081:8081     # for artifactory communication
+     - 8082:8082     # for router communication
+    depends_on:
+     - postgresql
+    links:
+     - postgresql
+    volumes:
+     - "{{ docker_artifactory_data }}/artifactory:/var/opt/jfrog/artifactory"
+     - "{{ docker_artifactory_data }}/artifactory_extra_conf:/artifactory_extra_conf"
+     - /etc/localtime:/etc/localtime:ro
+    environment:
+     - ENABLE_MIGRATION=y
+     - JF_SHARED_DATABASE_TYPE=postgresql
+     - JF_SHARED_DATABASE_USERNAME={{ docker_artifactory_postgres_user }}
+     - JF_SHARED_DATABASE_PASSWORD={{ docker_artifactory_postgres_password }}
+     - JF_SHARED_DATABASE_URL=jdbc:postgresql://postgresql:5432/artifactory
+     - JF_SHARED_DATABASE_DRIVER=org.postgresql.Driver
+     - JF_SHARED_NODE_IP={{ ansible_default_ipv4.address }}
+     - JF_SHARED_NODE_ID=localhost
+     - JF_ROUTER_ENTRYPOINTS_EXTERNALPORT=8082
+     - TZ={{ docker_artifactory_timezone }}
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+  nginx:
+    image: nginx:{{ docker_artifactory_nginx_tag }}
+    container_name: nginx
+    ports:
+     - 80:80
+     - 443:443
+    depends_on:
+     - artifactory
+    links:
+     - artifactory
+    volumes:
+     - "{{ docker_artifactory_data }}/nginx/conf.d/artifactory.conf:/etc/nginx/conf.d/artifactory.conf"
+     - "{{ docker_artifactory_data }}/nginx/logs:/var/log/nginx"
+     - "{{ docker_artifactory_data }}/nginx/ssl:/etc/ssl"
+     - /etc/localtime:/etc/localtime:ro
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000

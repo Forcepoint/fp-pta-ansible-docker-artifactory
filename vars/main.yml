@@ -1,3 +1,5 @@
 ---
 
 vaulted_docker_artifactory_artifactory_user_password: "{{ docker_artifactory_artifactory_user_password }}"
+docker_artifactory_docker_compose_folder: "{{ docker_artifactory_data }}/docker_compose/"
+docker_artifactory_postgres_default_db: artifactory
