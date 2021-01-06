@@ -196,7 +196,8 @@
 
 - name: run the postgres export and import
   include_tasks: postgresql_migrate.yml
-  when: docker_artifactory_postgresql_pull_result.changed or docker_artifactory_postgresql_migrate_bool
+  # Whether the user entered "yes" as a string or yes as a bool, this will ensure it gets evaluated correctly.
+  when: docker_artifactory_postgresql_pull_result.changed or docker_artifactory_postgresql_migrate == "yes" or docker_artifactory_postgresql_migrate == yes
 
 - name: bring up the docker instance for postgresql
   become: yes
