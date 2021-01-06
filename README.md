@@ -74,12 +74,6 @@ Again, make sure you get that password vaulted so it's not in plain text!
         docker_artifactory_dns: artifactory.COMPANY.com
         docker_artifactory_postgres_user: puser
         docker_artifactory_postgres_password: ppassword
-        docker_artifactory_certs_to_trust:
-          # You baked your private CA certificate into the base image, use remote_src yes.
-          - { path: '/etc/pki/ca-trust/custom/private_ca.pem', remote_src: yes }
-          # The RHEL CND certificate. It's not included in the Java truststore by default.
-          # May make more sense to get it from the playbook than to bake it into the base image. Use remote_src no.
-          - { path: 'files/rhel_cnd.pem', remote_src: no }
       roles:
          - role: docker-artifactory
 
