@@ -58,6 +58,11 @@ Ensure they're vaulted before committing them to source code control.
   tag is changed. You shouldn't need to set this unless you must force the replacement of 
   the postgres data. Afterwards, you should set this back to no.
 * docker_artifactory_nginx_tag: The tag of the NGINX container to pull.
+* docker_artifactory_certs_to_trust: A list of certificates to add into 
+  Artifactory's java keystore and whether they are remote or not.
+  Useful if you're using a private CA for Artifactory's web certificates. 
+  Also useful if Artifactory needs to interact with other web applications whose
+  certificates aren't in the java truststore, like RedHat's CND.
 
 Make sure you get any passwords vaulted so they're not in plain text!
 
@@ -74,6 +79,12 @@ Again, make sure you get that password vaulted so it's not in plain text!
         docker_artifactory_dns: artifactory.COMPANY.com
         docker_artifactory_postgres_user: puser
         docker_artifactory_postgres_password: ppassword
+        docker_artifactory_certs_to_trust:
+          # You baked your private CA certificate into the base image, use remote_src yes.
+          - { path: '/etc/pki/ca-trust/custom/private_ca.pem', remote_src: yes }
+          # The RHEL CND certificate. It's not included in the Java truststore by default.
+          # May make more sense to get it from the playbook than to bake it into the base image. Use remote_src no.
+          - { path: 'files/rhel_cnd.pem', remote_src: no }
       roles:
          - role: docker-artifactory
 

@@ -33,11 +33,24 @@
   with_items:
     - artifactory
     - artifactory/etc/plugins
+    - artifactory/etc/security/keys/trusted
     - artifactory/access
     - artifactory/backup
     - artifactory/data
     - artifactory/logs
   notify: "restart nginx"
+
+- name: copy certificates to trust
+  become: yes
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ docker_artifactory_data }}/artifactory/etc/security/keys/trusted"
+    remote_src: "{{ item.remote_src }}"
+    mode: 0744
+    owner: artifactory
+    group: artifactory
+  loop: "{{ docker_artifactory_certs_to_trust }}"
+  when: docker_artifactory_certs_to_trust is defined
 
 - name: copy the artifactory license
   become: yes
