@@ -39,14 +39,6 @@
     - artifactory/logs
   notify: "restart nginx"
 
-- name: create the artifactory_dockerfile folder
-  become: yes
-  file:
-    path: "{{ docker_artifactory_data }}/artifactory_dockerfile/certs/"
-    state: directory
-    mode: 0740
-    recurse: yes
-
 - name: copy the artifactory license
   become: yes
   copy:
