@@ -72,16 +72,6 @@
   with_fileglob:
     - "files/plugins/*"
 
-  # By default, everything in the file is commented out, so doing an overwrite is okay.
-- name: copy the artifactory system properties file
-  become: yes
-  copy:
-    src: files/artifactory.system.properties
-    dest: "{{ docker_artifactory_data }}/artifactory/etc/"
-    mode: 0400
-    owner: artifactory
-    group: artifactory
-
 - name: create the nginx folders
   become: yes
   file:

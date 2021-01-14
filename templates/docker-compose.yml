@@ -34,6 +34,7 @@ services:
      - /etc/localtime:/etc/localtime:ro
     environment:
      - ENABLE_MIGRATION=y
+     # https://www.jfrog.com/confluence/display/JFROG/Artifactory+System+YAML
      - JF_SHARED_DATABASE_TYPE=postgresql
      - JF_SHARED_DATABASE_USERNAME={{ docker_artifactory_postgres_user }}
      - JF_SHARED_DATABASE_PASSWORD={{ docker_artifactory_postgres_password }}
@@ -42,6 +43,7 @@ services:
      - JF_SHARED_NODE_IP={{ ansible_default_ipv4.address }}
      - JF_SHARED_NODE_ID=localhost
      - JF_ROUTER_ENTRYPOINTS_EXTERNALPORT=8082
+     - JF_FRONTEND_SESSION_TIMEMINUTES=10080
      - TZ={{ docker_artifactory_timezone }}
     restart: always
     ulimits:
