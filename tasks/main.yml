@@ -227,11 +227,6 @@
       - nginx
   register: docker_artifactory_compose_artifactory_nginx_result
 
-- assert:
-    that:
-      - "docker_artifactory_compose_artifactory_nginx_result.ansible_facts.artifactory.artifactory.state.running"
-      - "docker_artifactory_compose_artifactory_nginx_result.ansible_facts.nginx.nginx.state.running"
-
 - name: delete the docker-compose as it has secrets
   become: yes
   file:
