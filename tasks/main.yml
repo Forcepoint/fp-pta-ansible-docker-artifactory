@@ -209,10 +209,6 @@
       - postgresql
   register: docker_artifactory_compose_postgresql_result
 
-- assert:
-    that:
-      - "docker_artifactory_compose_postgresql_result.ansible_facts.postgresql.postgresql.state.running"
-
 - name: wait 15 seconds to ensure the postgresql container is up
   pause:
     seconds: 15
