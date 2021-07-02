@@ -1,0 +1,34 @@
+---
+
+- name: copy the data dump into the container
+  become: yes
+  ansible.builtin.shell:
+    cmd: docker cp {{ docker_artifactory_docker_compose_folder }}/dump.sql postgresql:/tmp
+    executable: /bin/bash
+
+- name: wait 15 seconds to ensure the database has had time to startup
+  pause:
+    seconds: 15
+
+- name: import the postgres data
+  become: yes
+  ansible.builtin.shell:
+    cmd: docker exec postgresql sh -c 'psql -U {{ docker_artifactory_postgres_user }} -d {{ docker_artifactory_postgres_default_db }} < /tmp/dump.sql'
+    executable: /bin/bash
+
+- name: wait 15 seconds to ensure the changes have all been imported
+  pause:
+    seconds: 15
+
+- name: delete the data dump file from the docker compose
+  become: yes
+  ansible.builtin.file:
+    path: "{{ docker_artifactory_docker_compose_folder }}/dump.sql"
+    state: absent
+
+- name: delete the backup of the postgresql mapped volume
+  become: yes
+  ansible.builtin.file:
+    path: "{{ docker_artifactory_data }}/postgresql.bak"
+    state: absent
+

@@ -165,6 +165,15 @@
     mode: 0740
     recurse: yes
 
+# Normally, when using docker-compose, I would let the compose spin up the containers all at once. It's easier that way.
+# Unfortunately, starting from Artifactory 7.8.x, PostgreSQL needs to be started before starting the other services.
+# So let's start it first by default from now on, not caring what version of Artifactory we're using.
+
+- name: export postgres data
+  include_tasks: postgresql_export.yml
+  # Whether the user entered "yes" as a string or yes as a bool, this will ensure it gets evaluated correctly.
+  when: docker_artifactory_postgresql_container_result.exists and (docker_artifactory_postgresql_pull_result.changed or docker_artifactory_postgresql_migrate | bool)
+
 - name: copy the docker-compose.yml file
   become: yes
   template:
@@ -173,32 +182,6 @@
     mode: 0700
     owner: root
     group: root
-
-# Normally, when using docker-compose, I would let the compose spin up the containers all at once. It's easier that way.
-# Unfortunately, starting from Artifactory 7.8.x, PostgreSQL needs to be started before starting the other services.
-# So let's start it first by default from now on, not caring what version of Artifactory we're using.
-
-- name: stop the artifactory and nginx containers
-  become: yes
-  community.general.docker_compose:
-    project_name: artifactory
-    project_src: "{{ docker_artifactory_docker_compose_folder }}"
-    stopped: yes
-    services:
-      - artifactory
-      - nginx
-  when: docker_artifactory_nginx_pull_result.changed or docker_artifactory_artifactory_pull_result.changed or docker_artifactory_postgresql_pull_result.changed
-
-- name: get info on postgresql container
-  become: yes
-  community.general.docker_container_info:
-    name: postgresql
-  register: docker_artifactory_postgresql_container_result
-
-- name: run the postgres export and import
-  include_tasks: postgresql_migrate.yml
-  # Whether the user entered "yes" as a string or yes as a bool, this will ensure it gets evaluated correctly.
-  when: docker_artifactory_postgresql_container_result.exists and (docker_artifactory_postgresql_pull_result.changed or docker_artifactory_postgresql_migrate | bool)
 
 - name: bring up the docker instance for postgresql
   become: yes
@@ -212,6 +195,11 @@
 - name: wait 15 seconds to ensure the postgresql container is up
   pause:
     seconds: 15
+
+- name: import postgres data
+  include_tasks: postgresql_import.yml
+  # Whether the user entered "yes" as a string or yes as a bool, this will ensure it gets evaluated correctly.
+  when: docker_artifactory_postgresql_container_result.exists and (docker_artifactory_postgresql_pull_result.changed or docker_artifactory_postgresql_migrate | bool)
 
 - name: bring up the docker instances for artifactory and nginx
   become: yes
