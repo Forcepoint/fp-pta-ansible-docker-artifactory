@@ -48,15 +48,15 @@ Ensure they're vaulted before committing them to source code control.
 * docker_artifactory_postgres_user: The user to create and connect to the Postgres instance with. This should be vaulted.
 * docker_artifactory_postgres_password: The password for the Postgres user. This should be vaulted.
 * docker_artifactory_data: The path on the docker host to store all the data which should be persistent.
+* docker_artifactory_postgresql_migrate: Set this to `yes` when you change a major version of postgresql.
+  Once your upgrade is done, be sure to change this back to `no`. When yes, the database is extracted
+  and the data imported into a new container. This is required so you're aware of what your upgrade is doing.
+  This can cause problems if not handled correctly.
 
 ### OPTIONAL
 
-* docker_artifactory_artifactory_pro_tag: The tag of the Artifactory Pro container to pull.
+* docker_artifactory_artifactory_pro_tag: The tag of the Artifactory Pro container to pull. 
 * docker_artifactory_postgresql_tag: The tag of the PostgreSQL container to pull.
-* docker_artifactory_postgresql_migrate: When yes, the database is extracted, a new container 
-  spun up in its place, and the data reimported. This is run by default when the postgresql 
-  tag is changed. You shouldn't need to set this unless you must force the replacement of 
-  the postgres data. Afterwards, you should set this back to no.
 * docker_artifactory_nginx_tag: The tag of the NGINX container to pull.
 * docker_artifactory_certs_to_trust: A list of certificates to add into 
   Artifactory's java keystore and whether they are remote or not.
