@@ -209,9 +209,3 @@
       - artifactory
       - nginx
   register: docker_artifactory_compose_artifactory_nginx_result
-
-- name: delete the docker-compose as it has secrets
-  become: yes
-  file:
-    path: "{{ docker_artifactory_docker_compose_folder }}"
-    state: absent
